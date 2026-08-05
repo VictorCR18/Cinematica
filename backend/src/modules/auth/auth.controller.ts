@@ -3,7 +3,7 @@ import { env, isProduction } from '../../config/env.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import * as authService from './auth.service.js';
 
-const COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7; // 7 dias
+const COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
 
 const setAuthCookie = (res: Response, token: string) => {
   res.cookie(env.COOKIE_NAME, token, {
@@ -11,6 +11,7 @@ const setAuthCookie = (res: Response, token: string) => {
     secure: isProduction,
     sameSite: isProduction ? 'none' : 'lax',
     maxAge: COOKIE_MAX_AGE_MS,
+    path: '/api',
   });
 };
 
