@@ -1,7 +1,7 @@
-import type { Request, Response } from 'express';
-import { env, isProduction } from '../../config/env.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
-import * as authService from './auth.service.js';
+import type { Request, Response } from "express";
+import { env, isProduction } from "../../config/env.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import * as authService from "./auth.service.js";
 
 const COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
 
@@ -9,9 +9,9 @@ const setAuthCookie = (res: Response, token: string) => {
   res.cookie(env.COOKIE_NAME, token, {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    sameSite: isProduction ? "none" : "lax",
     maxAge: COOKIE_MAX_AGE_MS,
-    path: '/',
+    path: "/",
   });
 };
 
@@ -28,7 +28,11 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const logout = asyncHandler(async (_req: Request, res: Response) => {
-  res.clearCookie(env.COOKIE_NAME);
+  res.clearCookie(env.COOKIE_NAME, {
+    path: "/",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  });
   res.status(204).send();
 });
 
