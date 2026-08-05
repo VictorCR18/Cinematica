@@ -9,6 +9,8 @@ import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js
 
 export const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(helmet());
 
 const allowedOrigins = env.CORS_ORIGIN ? env.CORS_ORIGIN.split(',') : [];
