@@ -11,7 +11,7 @@ const setAuthCookie = (res: Response, token: string) => {
     secure: isProduction,
     sameSite: isProduction ? 'none' : 'lax',
     maxAge: COOKIE_MAX_AGE_MS,
-    path: '/api',
+    path: '/',
   });
 };
 
