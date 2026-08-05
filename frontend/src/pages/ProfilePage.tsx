@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
 import { getProfile } from '../lib/api/users';
 import { listDiaryByUsername } from '../lib/api/diary';
 import { listListsByUsername } from '../lib/api/lists';
@@ -11,6 +10,8 @@ import { Avatar } from '../components/ui/Avatar';
 import { FollowButton } from '../components/social/FollowButton';
 import { tmdbImage } from '../lib/tmdb-image';
 import { Skeleton } from '../components/ui/Skeleton';
+import { Button } from '../components/ui/Button';
+import { EditProfileModal } from '../components/profile/EditProfileModal';
 import clsx from 'clsx';
 
 type Tab = 'diario' | 'listas';
@@ -18,7 +19,9 @@ type Tab = 'diario' | 'listas';
 export const ProfilePage = () => {
   const { username } = useParams<{ username: string }>();
   const { user: viewer } = useAuth();
+  
   const [tab, setTab] = useState<Tab>('diario');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', username],
@@ -50,14 +53,27 @@ export const ProfilePage = () => {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+      
       <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
         <Avatar name={profile.name} src={profile.avatarUrl} size={84} />
+        
         <div className="flex-1">
           <h1 className="font-display text-3xl font-semibold text-paper">{profile.name}</h1>
           <p className="text-muted">@{profile.username}</p>
           {profile.bio && <p className="mt-2 max-w-lg text-sm text-paper-dim">{profile.bio}</p>}
         </div>
-        {!isViewer && viewer && <FollowButton username={profile.username} initialFollowing={profile.isFollowedByViewer} />}
+        
+        <div className="flex items-center gap-3">
+          {!isViewer && viewer && (
+            <FollowButton username={profile.username} initialFollowing={profile.isFollowedByViewer} />
+          )}
+          
+          {isViewer && (
+            <Button onClick={() => setIsEditModalOpen(true)} variant="secondary">
+              Editar perfil
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="mt-8 grid grid-cols-3 gap-4 sm:grid-cols-5">
@@ -129,6 +145,13 @@ export const ProfilePage = () => {
             <p className="text-sm text-muted">Nenhuma lista criada ainda.</p>
           ))}
       </div>
+
+      <EditProfileModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        profile={profile} 
+        viewer={viewer} 
+      />
     </div>
   );
 };

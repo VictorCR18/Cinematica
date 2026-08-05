@@ -11,6 +11,11 @@ export const updateMe = asyncHandler(async (req: Request, res: Response) => {
   res.json(await usersService.updateMe(req.user!.id, req.body));
 });
 
+export const changePassword = asyncHandler(async (req: Request, res: Response) => {
+  await usersService.changePassword(req.user!.id, req.body);
+  res.status(204).send();
+});
+
 export const follow = asyncHandler(async (req: Request, res: Response) => {
   const { username } = req.params as { username: string };
   res.status(201).json(await usersService.follow(req.user!.id, username));

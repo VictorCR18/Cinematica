@@ -1,6 +1,9 @@
+import bcrypt from 'bcryptjs';
 import { prisma } from '../../config/prisma.js';
 import { AppError } from '../../utils/AppError.js';
 import { logActivity } from '../activity/activity.service.js';
+
+const SALT_ROUNDS = 12;
 
 const profileSelect = {
   id: true,
@@ -36,6 +39,20 @@ export const getProfileByUsername = async (username: string, viewerId?: string) 
 
 export const updateMe = (userId: string, data: { name?: string; bio?: string; avatarUrl?: string }) =>
   prisma.user.update({ where: { id: userId }, data, select: profileSelect });
+
+export const changePassword = async (
+  userId: string,
+  input: { currentPassword: string; newPassword: string; confirmNewPassword: string },
+) => {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { passwordHash: true } });
+  if (!user) throw AppError.notFound('Usuário não encontrado');
+
+  const validCurrentPassword = await bcrypt.compare(input.currentPassword, user.passwordHash);
+  if (!validCurrentPassword) throw AppError.unauthorized('Senha atual incorreta');
+
+  const passwordHash = await bcrypt.hash(input.newPassword, SALT_ROUNDS);
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
+};
 
 export const follow = async (followerId: string, targetUsername: string) => {
   const target = await prisma.user.findUnique({ where: { username: targetUsername } });
