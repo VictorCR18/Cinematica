@@ -8,7 +8,9 @@ interface AvatarProps {
 }
 
 export const Avatar = ({ name, src, size = 36, className }: AvatarProps) => {
-  const initials = name
+  const safeName = name || '';
+
+  const initials = safeName
     .split(' ')
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase())

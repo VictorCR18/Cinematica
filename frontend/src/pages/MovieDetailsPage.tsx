@@ -137,7 +137,7 @@ export const MovieDetailsPage = () => {
         {cast.length > 0 && (
           <section>
             <h2 className="font-display text-2xl font-semibold text-paper mb-4">Elenco</h2>
-            <div className="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-width:none [&::-webkit-scrollbar]:hidden">
               {cast.map((member) => {
                 const photo = tmdbImage(member.profile_path, 'w200');
                 return (

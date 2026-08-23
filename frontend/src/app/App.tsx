@@ -16,6 +16,7 @@ import { ProfilePage } from "../pages/ProfilePage";
 import { FeedPage } from "../pages/FeedPage";
 import { ListDetailsPage } from "../pages/ListDetailsPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
+import { ScrollToTop } from "../components/layout/ScrollToTop";
 
 export const App = () => {
   useBootstrapAuth();
@@ -23,6 +24,7 @@ export const App = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <ScrollToTop />
       <Navbar />
       <main className="flex-1">
         <AnimatePresence mode="wait">

@@ -56,8 +56,23 @@ export interface MovieDetails extends TmdbMovieSummary {
   genres: { id: number; name: string }[];
   tagline: string | null;
   appId: string;
-  credits?: { cast: { id: number; name: string; character: string; profile_path: string | null }[] };
-  videos?: { results: { id: string; key: string; site: string; type: string; name: string }[] };
+  credits?: {
+    cast: {
+      id: number;
+      name: string;
+      character: string;
+      profile_path: string | null;
+    }[];
+  };
+  videos?: {
+    results: {
+      id: string;
+      key: string;
+      site: string;
+      type: string;
+      name: string;
+    }[];
+  };
   similar?: TmdbPaginated<TmdbMovieSummary>;
   stats: {
     averageRating: number | null;
@@ -84,8 +99,9 @@ export interface Review {
   userId: string;
   movieId: string;
   createdAt: string;
-  user: Pick<User, 'id' | 'name' | 'username' | 'avatarUrl'>;
+  user: Pick<User, "id" | "name" | "username" | "avatarUrl">;
   movie?: Movie;
+  isLikedByViewer: boolean;
 }
 
 export interface DiaryEntry {
@@ -115,11 +131,17 @@ export interface FilmList {
   description: string | null;
   isPublic: boolean;
   createdAt: string;
-  user: Pick<User, 'id' | 'name' | 'username' | 'avatarUrl'>;
+  user: Pick<User, "id" | "name" | "username" | "avatarUrl">;
   items: { id: string; note: string | null; position: number; movie: Movie }[];
 }
 
-export type ActivityType = 'RATING' | 'REVIEW' | 'DIARY' | 'WATCHLIST_ADD' | 'LIST_CREATED' | 'FOLLOW';
+export type ActivityType =
+  | "RATING"
+  | "REVIEW"
+  | "DIARY"
+  | "WATCHLIST_ADD"
+  | "LIST_CREATED"
+  | "FOLLOW";
 
 export interface ActivityItem {
   id: string;
@@ -129,7 +151,7 @@ export interface ActivityItem {
   refId: string | null;
   metadata: Record<string, unknown> | null;
   createdAt: string;
-  user: Pick<User, 'id' | 'name' | 'username' | 'avatarUrl'>;
+  user: Pick<User, "id" | "name" | "username" | "avatarUrl">;
   movie: Movie | null;
 }
 
