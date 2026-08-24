@@ -142,11 +142,17 @@ export const Navbar = () => {
                 <Avatar name={user.name} src={user.avatarUrl} size={28} />
                 <span className="text-sm">{user.name}</span>
               </Link>
-              <div className="flex items-center gap-4 pl-10 text-sm">
-                <Link to="/configuracoes" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5 text-paper-dim">
+              <div className="flex flex-col items-start gap-2 pt-2 text-md">
+                <Link to="/configuracoes" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5 pb-2 text-paper-dim">
                   <Settings size={16} /> Configurações
                 </Link>
-                <button onClick={handleLogout} className="flex items-center gap-1.5 text-muted">
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    handleLogout();
+                  }}
+                  className="flex items-center gap-1.5 text-muted"
+                >
                   <LogOut size={16} /> Sair
                 </button>
               </div>
