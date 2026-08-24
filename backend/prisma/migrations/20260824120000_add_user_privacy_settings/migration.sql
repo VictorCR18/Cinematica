@@ -1,0 +1,4 @@
+ALTER TABLE "users"
+ADD COLUMN "reviewsPublic" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN "watchlistPublic" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN "listsPublic" BOOLEAN NOT NULL DEFAULT true;

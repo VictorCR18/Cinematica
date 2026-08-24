@@ -11,7 +11,7 @@ movieReviewsRouter.get('/:tmdbId/reviews', optionalAuth, validate({ params: tmdb
 
 /** Rotas independentes em /api/reviews */
 export const reviewsRouter = Router();
-reviewsRouter.get('/:id', validate({ params: reviewIdParamSchema }), controller.getOne);
+reviewsRouter.get('/:id', optionalAuth, validate({ params: reviewIdParamSchema }), controller.getOne);
 reviewsRouter.patch('/:id', requireAuth, validate({ params: reviewIdParamSchema, body: updateReviewSchema }), controller.update);
 reviewsRouter.delete('/:id', requireAuth, validate({ params: reviewIdParamSchema }), controller.remove);
 reviewsRouter.post('/:id/like', requireAuth, validate({ params: reviewIdParamSchema }), controller.like);

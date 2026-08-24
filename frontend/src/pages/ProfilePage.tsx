@@ -63,7 +63,11 @@ export const ProfilePage = () => {
 
   useEffect(() => {
     const requestedTab = searchParams.get("tab");
-    if (requestedTab === "diario" || requestedTab === "listas" || requestedTab === "watchlist") {
+    if (
+      requestedTab === "diario" ||
+      requestedTab === "listas" ||
+      requestedTab === "watchlist"
+    ) {
       setTab(requestedTab);
     }
   }, [searchParams]);
@@ -124,8 +128,16 @@ export const ProfilePage = () => {
       <div className="mt-8 grid grid-cols-3 gap-4 sm:grid-cols-5">
         {[
           ["Filmes", profile.stats.diaryCount],
-          ["Avaliações", profile.stats.ratingsCount, `/perfil/${profile.username}/avaliacoes`],
-          ["Resenhas", profile.stats.reviewsCount, `/perfil/${profile.username}/resenhas`],
+          [
+            "Avaliações",
+            profile.stats.ratingsCount,
+            `/perfil/${profile.username}/avaliacoes`,
+          ],
+          [
+            "Resenhas",
+            profile.stats.reviewsCount,
+            `/perfil/${profile.username}/resenhas`,
+          ],
           [
             "Seguidores",
             profile.stats.followersCount,
@@ -137,6 +149,7 @@ export const ProfilePage = () => {
             `/perfil/${profile.username}/seguindo`,
           ],
         ].map(([label, value, href]) => {
+          if (label === "Resenhas" && profile.reviewsPublic === false && !isViewer) return null;
           const card = (
             <div className="rounded-card border border-border bg-panel py-4 text-center">
               <p className="font-mono text-xl text-paper">{value as number}</p>
@@ -150,7 +163,7 @@ export const ProfilePage = () => {
                 key={label as string}
                 type="button"
                 onClick={handleDiaryScroll}
-                className="block text-left transition-transform hover:-translate-y-0.5"
+                className="block cursor-pointer text-left transition-transform hover:-translate-y-0.5"
               >
                 {card}
               </button>
@@ -172,7 +185,7 @@ export const ProfilePage = () => {
       </div>
 
       <div className="mt-10 flex gap-1 border-b border-border">
-        {(["diario", "listas", "watchlist"] as Tab[]).map((t) => (
+        {(["diario", profile.listsPublic !== false ? "listas" : null, profile.watchlistPublic !== false ? "watchlist" : null].filter(Boolean) as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}

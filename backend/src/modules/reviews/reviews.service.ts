@@ -13,6 +13,7 @@ const authorSelect = {
   name: true,
   username: true,
   avatarUrl: true,
+  reviewsPublic: true,
 } as const;
 
 interface CreateReviewInput {
@@ -50,16 +51,22 @@ export const listReviewsForMovie = async (
   const movie = await prisma.movie.findUnique({ where: { tmdbId } });
   if (!movie) return { data: [], meta: buildMeta(1, 20, 0) };
 
+  const visibilityFilter = {
+    OR: [{ user: { reviewsPublic: true } }, ...(viewerId ? [{ userId: viewerId }] : [])],
+  } as any;
+
   const { page, limit, skip, take } = parsePagination(query);
   const [data, total] = await Promise.all([
     prisma.review.findMany({
-      where: { movieId: movie.id },
+      where: { movieId: movie.id, ...visibilityFilter },
       include: { user: { select: authorSelect } },
       orderBy: { createdAt: "desc" },
       skip,
       take,
     }),
-    prisma.review.count({ where: { movieId: movie.id } }),
+    prisma.review.count({
+      where: { movieId: movie.id, ...visibilityFilter },
+    }),
   ]);
 
   const likedIds = viewerId
@@ -88,6 +95,7 @@ export const getReviewById = async (id: string, viewerId?: string) => {
     include: { user: { select: authorSelect }, movie: true },
   });
   if (!review) throw AppError.notFound("Resenha não encontrada");
+  if (!review.user.reviewsPublic && review.userId !== viewerId) throw AppError.notFound("Resenha não encontrada");
 
   const isLikedByViewer = viewerId
     ? Boolean(

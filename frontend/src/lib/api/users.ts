@@ -1,11 +1,19 @@
 import { api } from '../api-client';
-import type { ConnectionUser, PaginatedResponse, Review, User, UserMovieRating, UserProfile } from '../../types';
+import type { ConnectionUser, PaginatedResponse, Review, User, UserMovieRating, UserProfile, UserSettings } from '../../types';
 
 export const getProfile = (username: string) =>
   api.get<UserProfile>(`/users/${username}`).then((r) => r.data);
 
 export const updateMe = (input: { name?: string; bio?: string; avatarUrl?: string }) =>
   api.patch<User>('/users/me', input).then((r) => r.data);
+
+export const getMySettings = () => api.get<UserSettings>('/users/me/settings').then((r) => r.data);
+
+export const updateMySettings = (input: Partial<Omit<UserSettings, 'email'>>) =>
+  api.patch<UserSettings>('/users/me/settings', input).then((r) => r.data);
+
+export const changeMyEmail = (input: { email: string; currentPassword: string }) =>
+  api.patch<{ email: string }>('/users/me/email', input).then((r) => r.data);
 
 export const changeMyPassword = (input: {
   currentPassword: string;

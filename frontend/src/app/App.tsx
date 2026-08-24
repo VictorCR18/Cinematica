@@ -22,6 +22,7 @@ import { ListDetailsPage } from "../pages/ListDetailsPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { ScrollToTop } from "../components/layout/ScrollToTop";
 import { NetworkActivityBar } from "../components/layout/NetworkActivityBar";
+import { SettingsPage } from "../pages/SettingsPage";
 
 export const App = () => {
   useBootstrapAuth();
@@ -81,6 +82,16 @@ export const App = () => {
                 <PageTransition>
                   <RegisterPage />
                 </PageTransition>
+              }
+            />
+            <Route
+              path="/configuracoes"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <SettingsPage />
+                  </PageTransition>
+                </ProtectedRoute>
               }
             />
             <Route

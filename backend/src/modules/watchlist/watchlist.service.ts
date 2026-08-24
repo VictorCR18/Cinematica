@@ -27,9 +27,10 @@ export const listMyWatchlist = (userId: string) =>
     orderBy: { addedAt: 'desc' },
   });
 
-export const listWatchlistByUsername = async (username: string) => {
-  const user = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+export const listWatchlistByUsername = async (username: string, viewerId?: string) => {
+  const user = await prisma.user.findUnique({ where: { username }, select: { id: true, watchlistPublic: true } });
   if (!user) return null;
+  if (!user.watchlistPublic && user.id !== viewerId) return [];
 
   return prisma.watchlistItem.findMany({
     where: { userId: user.id },

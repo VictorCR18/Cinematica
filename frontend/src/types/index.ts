@@ -5,7 +5,17 @@ export interface User {
   email?: string;
   bio: string | null;
   avatarUrl: string | null;
+  reviewsPublic?: boolean;
+  watchlistPublic?: boolean;
+  listsPublic?: boolean;
   createdAt: string;
+}
+
+export interface UserSettings {
+  email: string;
+  reviewsPublic: boolean;
+  watchlistPublic: boolean;
+  listsPublic: boolean;
 }
 
 export interface ConnectionUser extends User {

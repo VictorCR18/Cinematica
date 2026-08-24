@@ -8,7 +8,7 @@ export const listMine = asyncHandler(async (req: Request, res: Response) => {
 
 export const listByUsername = asyncHandler(async (req: Request, res: Response) => {
   const { username } = req.params as unknown as { username: string };
-  const items = await watchlistService.listWatchlistByUsername(username);
+  const items = await watchlistService.listWatchlistByUsername(username, req.user?.id);
   if (!items) {
     res.status(404).json({ message: 'Usuário não encontrado' });
     return;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAuth } from "../../middlewares/auth.middleware.js";
+import { optionalAuth, requireAuth } from "../../middlewares/auth.middleware.js";
 import { validate } from "../../middlewares/validate.middleware.js";
 import * as watchlistController from "./watchlist.controller.js";
 import { tmdbIdParamSchema, usernameParamSchema } from "./watchlist.schema.js";
@@ -10,6 +10,7 @@ watchlistRouter.get("/me", requireAuth, watchlistController.listMine);
 
 watchlistRouter.get(
   "/:username",
+  optionalAuth,
   validate({ params: usernameParamSchema }),
   watchlistController.listByUsername,
 );

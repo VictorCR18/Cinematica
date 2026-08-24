@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Film, Search, Menu, X, LogOut } from 'lucide-react';
+import { Film, Search, Menu, X, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Avatar } from '../ui/Avatar';
 import { Button } from '../ui/Button';
@@ -10,6 +10,7 @@ export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [query, setQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -67,10 +68,26 @@ export const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-3 ml-2">
           {isAuthenticated && user ? (
-            <div className="flex items-center gap-3">
-              <Link to={`/perfil/${user.username}`} className="flex items-center gap-2">
+            <div className="relative flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setProfileMenuOpen((open) => !open)}
+                aria-label="Abrir menu do perfil"
+                aria-expanded={profileMenuOpen}
+                className="flex items-center gap-2"
+              >
                 <Avatar name={user.name} src={user.avatarUrl} size={32} />
-              </Link>
+              </button>
+              {profileMenuOpen && (
+                <div className="absolute right-0 top-11 z-10 w-48 rounded-card border border-border bg-panel p-1 shadow-xl">
+                  <Link to={`/perfil/${user.username}`} onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-paper-dim hover:bg-ink hover:text-paper">
+                    <Film size={16} /> Ver perfil
+                  </Link>
+                  <Link to="/configuracoes" onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-paper-dim hover:bg-ink hover:text-paper">
+                    <Settings size={16} /> Configurações
+                  </Link>
+                </div>
+              )}
               <button
                 onClick={handleLogout}
                 aria-label="Sair"
@@ -120,14 +137,19 @@ export const Navbar = () => {
             ))}
           </nav>
           {isAuthenticated && user ? (
-            <div className="flex items-center justify-between pt-2 border-t border-border">
+            <div className="space-y-2 border-t border-border pt-2">
               <Link to={`/perfil/${user.username}`} className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
                 <Avatar name={user.name} src={user.avatarUrl} size={28} />
                 <span className="text-sm">{user.name}</span>
               </Link>
-              <button onClick={handleLogout} className="text-muted">
-                <LogOut size={18} />
-              </button>
+              <div className="flex items-center gap-4 pl-10 text-sm">
+                <Link to="/configuracoes" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5 text-paper-dim">
+                  <Settings size={16} /> Configurações
+                </Link>
+                <button onClick={handleLogout} className="flex items-center gap-1.5 text-muted">
+                  <LogOut size={16} /> Sair
+                </button>
+              </div>
             </div>
           ) : (
             <div className="flex gap-2 pt-2 border-t border-border">

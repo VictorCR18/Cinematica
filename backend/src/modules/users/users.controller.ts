@@ -11,6 +11,18 @@ export const updateMe = asyncHandler(async (req: Request, res: Response) => {
   res.json(await usersService.updateMe(req.user!.id, req.body));
 });
 
+export const getSettings = asyncHandler(async (req: Request, res: Response) => {
+  res.json(await usersService.getSettings(req.user!.id));
+});
+
+export const updateSettings = asyncHandler(async (req: Request, res: Response) => {
+  res.json(await usersService.updateSettings(req.user!.id, req.body));
+});
+
+export const changeEmail = asyncHandler(async (req: Request, res: Response) => {
+  res.json(await usersService.changeEmail(req.user!.id, req.body));
+});
+
 export const changePassword = asyncHandler(async (req: Request, res: Response) => {
   await usersService.changePassword(req.user!.id, req.body);
   res.status(204).send();

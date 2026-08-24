@@ -10,6 +10,17 @@ export const updateMeSchema = z.object({
   avatarUrl: z.url().optional().or(z.literal('')),
 });
 
+export const updateSettingsSchema = z.object({
+  reviewsPublic: z.boolean().optional(),
+  watchlistPublic: z.boolean().optional(),
+  listsPublic: z.boolean().optional(),
+});
+
+export const changeEmailSchema = z.object({
+  email: z.email('Informe um e-mail válido'),
+  currentPassword: z.string().min(1, 'Informe sua senha atual'),
+});
+
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Informe sua senha atual'),

@@ -12,7 +12,17 @@ const profileSelect = {
   username: true,
   bio: true,
   avatarUrl: true,
+  reviewsPublic: true,
+  watchlistPublic: true,
+  listsPublic: true,
   createdAt: true,
+} as const;
+
+const settingsSelect = {
+  email: true,
+  reviewsPublic: true,
+  watchlistPublic: true,
+  listsPublic: true,
 } as const;
 
 export const getProfileByUsername = async (username: string, viewerId?: string) => {
@@ -40,6 +50,28 @@ export const getProfileByUsername = async (username: string, viewerId?: string) 
 
 export const updateMe = (userId: string, data: { name?: string; bio?: string; avatarUrl?: string }) =>
   prisma.user.update({ where: { id: userId }, data, select: profileSelect });
+
+export const getSettings = (userId: string) =>
+  prisma.user.findUniqueOrThrow({ where: { id: userId }, select: settingsSelect });
+
+export const updateSettings = (userId: string, data: { reviewsPublic?: boolean; watchlistPublic?: boolean; listsPublic?: boolean }) =>
+  prisma.user.update({ where: { id: userId }, data, select: settingsSelect });
+
+export const changeEmail = async (userId: string, input: { email: string; currentPassword: string }) => {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, passwordHash: true } });
+  if (!user) throw AppError.notFound('Usuário não encontrado');
+  if (user.email === input.email) return { email: user.email };
+
+  const validPassword = await bcrypt.compare(input.currentPassword, user.passwordHash);
+  if (!validPassword) throw AppError.unauthorized('Senha atual incorreta');
+
+  try {
+    return await prisma.user.update({ where: { id: userId }, data: { email: input.email }, select: { email: true } });
+  } catch (error) {
+    if ((error as { code?: string }).code === 'P2002') throw AppError.conflict('Este e-mail já está em uso');
+    throw error;
+  }
+};
 
 export const changePassword = async (
   userId: string,
@@ -175,8 +207,9 @@ export const listRatingsByUsername = async (username: string, query: PaginationQ
 };
 
 export const listReviewsByUsername = async (username: string, query: PaginationQuery, viewerId?: string) => {
-  const user = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+  const user = await prisma.user.findUnique({ where: { username }, select: { id: true, reviewsPublic: true } });
   if (!user) throw AppError.notFound('Usuário não encontrado');
+  if (!user.reviewsPublic && user.id !== viewerId) return { data: [], meta: buildMeta(1, 20, 0) };
 
   const { page, limit, skip, take } = parsePagination(query);
 

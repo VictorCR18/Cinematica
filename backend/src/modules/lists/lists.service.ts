@@ -15,8 +15,9 @@ export const createList = async (userId: string, input: { name: string; descript
 };
 
 export const listListsByUsername = async (username: string, viewerId?: string) => {
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findUnique({ where: { username }, select: { id: true, listsPublic: true } });
   if (!user) throw AppError.notFound('Usuário não encontrado');
+  if (!user.listsPublic && viewerId !== user.id) return [];
 
   return prisma.list.findMany({
     where: { userId: user.id, ...(viewerId === user.id ? {} : { isPublic: true }) },
