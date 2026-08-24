@@ -13,6 +13,8 @@ import { MovieDetailsPage } from "../pages/MovieDetailsPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 import { ProfilePage } from "../pages/ProfilePage";
+import { FollowersPage } from "../pages/FollowersPage";
+import { FollowingPage } from "../pages/FollowingPage";
 import { FeedPage } from "../pages/FeedPage";
 import { ListDetailsPage } from "../pages/ListDetailsPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
@@ -82,6 +84,22 @@ export const App = () => {
               element={
                 <PageTransition>
                   <ProfilePage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/perfil/:username/seguidores"
+              element={
+                <PageTransition>
+                  <FollowersPage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/perfil/:username/seguindo"
+              element={
+                <PageTransition>
+                  <FollowingPage />
                 </PageTransition>
               }
             />

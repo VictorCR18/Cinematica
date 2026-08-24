@@ -1,14 +1,17 @@
-import { useState } from 'react';
-import clsx from 'clsx';
-import { Button } from '../ui/Button';
-import { followUser, unfollowUser } from '../../lib/api/users';
+import { useState } from "react";
+import clsx from "clsx";
+import { Button } from "../ui/Button";
+import { followUser, unfollowUser } from "../../lib/api/users";
 
 interface FollowButtonProps {
   username: string;
   initialFollowing: boolean;
 }
 
-export const FollowButton = ({ username, initialFollowing }: FollowButtonProps) => {
+export const FollowButton = ({
+  username,
+  initialFollowing,
+}: FollowButtonProps) => {
   const [following, setFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
 
@@ -29,13 +32,13 @@ export const FollowButton = ({ username, initialFollowing }: FollowButtonProps) 
 
   return (
     <Button
-      variant={following ? 'secondary' : 'primary'}
+      variant={following ? "secondary" : "primary"}
       size="sm"
       onClick={toggle}
       disabled={loading}
-      className={clsx(following && 'hover:border-accent hover:text-accent')}
+      className={clsx(following && "hover:border-accent hover:text-accent")}
     >
-      {following ? 'Seguindo' : 'Seguir'}
+      {following ? "Seguindo" : "Seguir"}
     </Button>
   );
 };

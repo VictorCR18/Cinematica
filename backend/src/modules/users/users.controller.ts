@@ -28,10 +28,10 @@ export const unfollow = asyncHandler(async (req: Request, res: Response) => {
 
 export const listFollowers = asyncHandler(async (req: Request, res: Response) => {
   const { username } = req.params as { username: string };
-  res.json(await usersService.listFollowers(username));
+  res.json(await usersService.listFollowers(username, req.user?.id));
 });
 
 export const listFollowing = asyncHandler(async (req: Request, res: Response) => {
   const { username } = req.params as { username: string };
-  res.json(await usersService.listFollowing(username));
+  res.json(await usersService.listFollowing(username, req.user?.id));
 });

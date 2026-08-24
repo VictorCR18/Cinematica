@@ -77,7 +77,7 @@ export const unfollow = async (followerId: string, targetUsername: string) => {
   return { following: false };
 };
 
-export const listFollowers = async (username: string) => {
+export const listFollowers = async (username: string, viewerId?: string) => {
   const user = await prisma.user.findUnique({ where: { username } });
   if (!user) throw AppError.notFound('Usuário não encontrado');
 
@@ -86,10 +86,28 @@ export const listFollowers = async (username: string) => {
     include: { follower: { select: profileSelect } },
     orderBy: { createdAt: 'desc' },
   });
-  return follows.map((f) => f.follower);
+
+  const viewerFollowingIds = viewerId
+    ? new Set(
+        (
+          await prisma.follow.findMany({
+            where: {
+              followerId: viewerId,
+              followingId: { in: follows.map((follow) => follow.follower.id) },
+            },
+            select: { followingId: true },
+          })
+        ).map((follow) => follow.followingId),
+      )
+    : new Set<string>();
+
+  return follows.map((follow) => ({
+    ...follow.follower,
+    isFollowedByViewer: viewerFollowingIds.has(follow.follower.id),
+  }));
 };
 
-export const listFollowing = async (username: string) => {
+export const listFollowing = async (username: string, viewerId?: string) => {
   const user = await prisma.user.findUnique({ where: { username } });
   if (!user) throw AppError.notFound('Usuário não encontrado');
 
@@ -98,5 +116,23 @@ export const listFollowing = async (username: string) => {
     include: { following: { select: profileSelect } },
     orderBy: { createdAt: 'desc' },
   });
-  return follows.map((f) => f.following);
+
+  const viewerFollowingIds = viewerId
+    ? new Set(
+        (
+          await prisma.follow.findMany({
+            where: {
+              followerId: viewerId,
+              followingId: { in: follows.map((follow) => follow.following.id) },
+            },
+            select: { followingId: true },
+          })
+        ).map((follow) => follow.followingId),
+      )
+    : new Set<string>();
+
+  return follows.map((follow) => ({
+    ...follow.following,
+    isFollowedByViewer: viewerFollowingIds.has(follow.following.id),
+  }));
 };

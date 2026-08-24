@@ -61,7 +61,14 @@ export const ProfilePage = () => {
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
       <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-        <Avatar name={profile.name} src={profile.avatarUrl} size={84} />
+        <Avatar
+          name={profile.name}
+          src={
+            profile.avatarUrl ??
+            `https://api.dicebear.com/9.x/thumbs/svg?seed=${profile.username}`
+          }
+          size={84}
+        />
 
         <div className="flex-1">
           <h1 className="font-display text-3xl font-semibold text-paper">
@@ -99,17 +106,36 @@ export const ProfilePage = () => {
           ["Filmes", profile.stats.diaryCount],
           ["Avaliações", profile.stats.ratingsCount],
           ["Resenhas", profile.stats.reviewsCount],
-          ["Seguidores", profile.stats.followersCount],
-          ["Seguindo", profile.stats.followingCount],
-        ].map(([label, value]) => (
-          <div
-            key={label as string}
-            className="rounded-card border border-border bg-panel py-4 text-center"
-          >
-            <p className="font-mono text-xl text-paper">{value as number}</p>
-            <p className="text-xs text-muted mt-0.5">{label as string}</p>
-          </div>
-        ))}
+          [
+            "Seguidores",
+            profile.stats.followersCount,
+            `/perfil/${profile.username}/seguidores`,
+          ],
+          [
+            "Seguindo",
+            profile.stats.followingCount,
+            `/perfil/${profile.username}/seguindo`,
+          ],
+        ].map(([label, value, href]) => {
+          const card = (
+            <div className="rounded-card border border-border bg-panel py-4 text-center">
+              <p className="font-mono text-xl text-paper">{value as number}</p>
+              <p className="mt-0.5 text-xs text-muted">{label as string}</p>
+            </div>
+          );
+
+          return href ? (
+            <Link
+              key={label as string}
+              to={href as string}
+              className="block transition-transform hover:-translate-y-0.5"
+            >
+              {card}
+            </Link>
+          ) : (
+            <div key={label as string}>{card}</div>
+          );
+        })}
       </div>
 
       <div className="mt-10 flex gap-1 border-b border-border">

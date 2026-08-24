@@ -8,6 +8,10 @@ export interface User {
   createdAt: string;
 }
 
+export interface ConnectionUser extends User {
+  isFollowedByViewer: boolean;
+}
+
 export interface UserProfile extends User {
   stats: {
     ratingsCount: number;
@@ -15,6 +19,8 @@ export interface UserProfile extends User {
     diaryCount: number;
     followersCount: number;
     followingCount: number;
+    followers?: User[];
+    following?: User[];
   };
   isFollowedByViewer: boolean;
   isViewer: boolean;
