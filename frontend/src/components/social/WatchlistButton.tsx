@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Bookmark, LoaderCircle } from 'lucide-react';
 import clsx from 'clsx';
-import { addToWatchlist, removeFromWatchlist } from '../../lib/api/watchlist';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { addToWatchlist, listMyWatchlist, removeFromWatchlist } from '../../lib/api/watchlist';
 import { useAuth } from '../../hooks/useAuth';
 
 interface WatchlistButtonProps {
@@ -12,8 +13,21 @@ interface WatchlistButtonProps {
 
 export const WatchlistButton = ({ tmdbId, initialInWatchlist = false }: WatchlistButtonProps) => {
   const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
   const [inWatchlist, setInWatchlist] = useState(initialInWatchlist);
   const [loading, setLoading] = useState(false);
+
+  const { data: watchlist } = useQuery({
+    queryKey: ['watchlist', 'me'],
+    queryFn: listMyWatchlist,
+    enabled: isAuthenticated,
+  });
+
+  useEffect(() => {
+    if (watchlist) {
+      setInWatchlist(watchlist.some((item) => item.movie.tmdbId === tmdbId));
+    }
+  }, [tmdbId, watchlist]);
 
   const toggle = async () => {
     if (!isAuthenticated || loading) return;
@@ -26,6 +40,7 @@ export const WatchlistButton = ({ tmdbId, initialInWatchlist = false }: Watchlis
         await addToWatchlist(tmdbId);
         setInWatchlist(true);
       }
+      await queryClient.invalidateQueries({ queryKey: ['watchlist', 'me'] });
     } finally {
       setLoading(false);
     }

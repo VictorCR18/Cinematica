@@ -63,7 +63,7 @@ export const Carousel = ({
 
       <motion.div
         ref={trackRef}
-        className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex gap-4 overflow-x-auto overflow-y-hidden pb-2 snap-x snap-mandatory scroll-smooth scrollbar-none"
       >
         {movies?.map((movie, i) => (
           <div key={movie.id} className="w-36 shrink-0 snap-start sm:w-44">
