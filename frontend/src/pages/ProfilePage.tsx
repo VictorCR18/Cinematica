@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { getProfile } from "../lib/api/users";
@@ -19,10 +19,23 @@ type Tab = "diario" | "listas" | "watchlist";
 
 export const ProfilePage = () => {
   const { username } = useParams<{ username: string }>();
+  const [searchParams] = useSearchParams();
   const { user: viewer } = useAuth();
 
   const [tab, setTab] = useState<Tab>("diario");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const diarySectionRef = useRef<HTMLDivElement | null>(null);
+
+  const handleDiaryScroll = () => {
+    setTab("diario");
+
+    requestAnimationFrame(() => {
+      diarySectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+  };
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", username],
@@ -47,6 +60,13 @@ export const ProfilePage = () => {
     queryFn: () => listWatchlistByUsername(username as string),
     enabled: Boolean(username) && tab === "watchlist",
   });
+
+  useEffect(() => {
+    const requestedTab = searchParams.get("tab");
+    if (requestedTab === "diario" || requestedTab === "listas" || requestedTab === "watchlist") {
+      setTab(requestedTab);
+    }
+  }, [searchParams]);
 
   if (isLoading || !profile) {
     return (
@@ -104,8 +124,8 @@ export const ProfilePage = () => {
       <div className="mt-8 grid grid-cols-3 gap-4 sm:grid-cols-5">
         {[
           ["Filmes", profile.stats.diaryCount],
-          ["Avaliações", profile.stats.ratingsCount],
-          ["Resenhas", profile.stats.reviewsCount],
+          ["Avaliações", profile.stats.ratingsCount, `/perfil/${profile.username}/avaliacoes`],
+          ["Resenhas", profile.stats.reviewsCount, `/perfil/${profile.username}/resenhas`],
           [
             "Seguidores",
             profile.stats.followersCount,
@@ -123,6 +143,19 @@ export const ProfilePage = () => {
               <p className="mt-0.5 text-xs text-muted">{label as string}</p>
             </div>
           );
+
+          if (label === "Filmes") {
+            return (
+              <button
+                key={label as string}
+                type="button"
+                onClick={handleDiaryScroll}
+                className="block text-left transition-transform hover:-translate-y-0.5"
+              >
+                {card}
+              </button>
+            );
+          }
 
           return href ? (
             <Link
@@ -159,7 +192,7 @@ export const ProfilePage = () => {
         ))}
       </div>
 
-      <div className="mt-8">
+      <div ref={diarySectionRef} className="mt-8 scroll-mt-32">
         {tab === "diario" &&
           (diary && diary.data.length > 0 ? (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 md:grid-cols-6">

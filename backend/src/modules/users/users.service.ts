@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../config/prisma.js';
 import { AppError } from '../../utils/AppError.js';
+import { buildMeta, parsePagination, type PaginationQuery } from '../../utils/pagination.js';
 import { logActivity } from '../activity/activity.service.js';
 
 const SALT_ROUNDS = 12;
@@ -135,4 +136,80 @@ export const listFollowing = async (username: string, viewerId?: string) => {
     ...follow.following,
     isFollowedByViewer: viewerFollowingIds.has(follow.following.id),
   }));
+};
+
+export const listRatingsByUsername = async (username: string, query: PaginationQuery) => {
+  const user = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+  if (!user) throw AppError.notFound('Usuário não encontrado');
+
+  const { page, limit, skip, take } = parsePagination(query);
+
+  const [data, total] = await Promise.all([
+    prisma.rating.findMany({
+      where: { userId: user.id },
+      include: {
+        movie: {
+          select: {
+            id: true,
+            tmdbId: true,
+            title: true,
+            originalTitle: true,
+            overview: true,
+            posterPath: true,
+            backdropPath: true,
+            releaseDate: true,
+            runtime: true,
+            voteAverage: true,
+            genres: true,
+          },
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+      skip,
+      take,
+    }),
+    prisma.rating.count({ where: { userId: user.id } }),
+  ]);
+
+  return { data, meta: buildMeta(page, limit, total) };
+};
+
+export const listReviewsByUsername = async (username: string, query: PaginationQuery, viewerId?: string) => {
+  const user = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+  if (!user) throw AppError.notFound('Usuário não encontrado');
+
+  const { page, limit, skip, take } = parsePagination(query);
+
+  const [data, total] = await Promise.all([
+    prisma.review.findMany({
+      where: { userId: user.id },
+      include: {
+        user: { select: profileSelect },
+        movie: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take,
+    }),
+    prisma.review.count({ where: { userId: user.id } }),
+  ]);
+
+  const likedIds = viewerId
+    ? new Set(
+        (
+          await prisma.reviewLike.findMany({
+            where: {
+              userId: viewerId,
+              reviewId: { in: data.map((review) => review.id) },
+            },
+            select: { reviewId: true },
+          })
+        ).map((like) => like.reviewId),
+      )
+    : new Set<string>();
+
+  return {
+    data: data.map((review) => ({ ...review, isLikedByViewer: likedIds.has(review.id) })),
+    meta: buildMeta(page, limit, total),
+  };
 };

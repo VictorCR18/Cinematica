@@ -15,10 +15,13 @@ import { RegisterPage } from "../pages/RegisterPage";
 import { ProfilePage } from "../pages/ProfilePage";
 import { FollowersPage } from "../pages/FollowersPage";
 import { FollowingPage } from "../pages/FollowingPage";
+import { UserRatingsPage } from "../pages/UserRatingsPage";
+import { UserReviewsPage } from "../pages/UserReviewsPage";
 import { FeedPage } from "../pages/FeedPage";
 import { ListDetailsPage } from "../pages/ListDetailsPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { ScrollToTop } from "../components/layout/ScrollToTop";
+import { NetworkActivityBar } from "../components/layout/NetworkActivityBar";
 
 export const App = () => {
   useBootstrapAuth();
@@ -26,6 +29,7 @@ export const App = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <NetworkActivityBar />
       <ScrollToTop />
       <Navbar />
       <main className="flex-1">
@@ -100,6 +104,22 @@ export const App = () => {
               element={
                 <PageTransition>
                   <FollowingPage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/perfil/:username/avaliacoes"
+              element={
+                <PageTransition>
+                  <UserRatingsPage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/perfil/:username/resenhas"
+              element={
+                <PageTransition>
+                  <UserReviewsPage />
                 </PageTransition>
               }
             />

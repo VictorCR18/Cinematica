@@ -1,5 +1,5 @@
 import { api } from '../api-client';
-import type { ConnectionUser, User, UserProfile } from '../../types';
+import type { ConnectionUser, PaginatedResponse, Review, User, UserMovieRating, UserProfile } from '../../types';
 
 export const getProfile = (username: string) =>
   api.get<UserProfile>(`/users/${username}`).then((r) => r.data);
@@ -19,3 +19,9 @@ export const listFollowers = (username: string) =>
   api.get<ConnectionUser[]>(`/users/${username}/followers`).then((r) => r.data);
 export const listFollowing = (username: string) =>
   api.get<ConnectionUser[]>(`/users/${username}/following`).then((r) => r.data);
+
+export const listRatingsByUsername = (username: string, page = 1) =>
+  api.get<PaginatedResponse<UserMovieRating>>(`/users/${username}/ratings`, { params: { page } }).then((r) => r.data);
+
+export const listReviewsByUsername = (username: string, page = 1) =>
+  api.get<PaginatedResponse<Review>>(`/users/${username}/reviews`, { params: { page } }).then((r) => r.data);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, LoaderCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { addToWatchlist, removeFromWatchlist } from '../../lib/api/watchlist';
 import { useAuth } from '../../hooks/useAuth';
@@ -36,15 +36,26 @@ export const WatchlistButton = ({ tmdbId, initialInWatchlist = false }: Watchlis
       whileTap={{ scale: 0.9 }}
       onClick={toggle}
       disabled={!isAuthenticated || loading}
-      title={inWatchlist ? 'Remover da watchlist' : 'Adicionar à watchlist'}
+      title={
+        loading
+          ? 'Atualizando watchlist...'
+          : inWatchlist
+            ? 'Remover da watchlist'
+            : 'Adicionar à watchlist'
+      }
+      aria-busy={loading}
       className={clsx(
-        'flex h-11 w-11 items-center justify-center rounded-full border transition-colors',
+        'flex h-11 w-11 items-center justify-center rounded-full border transition-colors disabled:opacity-70',
         inWatchlist ? 'border-gold bg-gold-soft text-gold' : 'border-border-strong text-paper-dim hover:text-paper hover:border-paper',
       )}
     >
-      <motion.span animate={{ scale: inWatchlist ? [1, 1.3, 1] : 1 }} transition={{ duration: 0.3 }}>
-        <Bookmark size={18} fill={inWatchlist ? 'currentColor' : 'none'} />
-      </motion.span>
+      {loading ? (
+        <LoaderCircle size={18} className="animate-spin" />
+      ) : (
+        <motion.span animate={{ scale: inWatchlist ? [1, 1.3, 1] : 1 }} transition={{ duration: 0.3 }}>
+          <Bookmark size={18} fill={inWatchlist ? 'currentColor' : 'none'} />
+        </motion.span>
+      )}
     </motion.button>
   );
 };

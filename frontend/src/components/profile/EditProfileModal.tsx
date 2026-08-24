@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { Eye, EyeOff, X } from 'lucide-react';
+import { Eye, EyeOff, LoaderCircle, X } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateMe, changeMyPassword } from '../../lib/api/users';
 import { useAuthStore } from '../../store/auth-store';
@@ -196,6 +196,7 @@ export const EditProfileModal = ({ isOpen, onClose, profile, viewer }: EditProfi
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
+              {isLoading && <LoaderCircle size={15} className="animate-spin" />}
               {isLoading ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </div>

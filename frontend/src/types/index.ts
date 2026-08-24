@@ -94,6 +94,11 @@ export interface Rating {
   userId: string;
   movieId: string;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface UserMovieRating extends Rating {
+  movie: Movie;
 }
 
 export interface Review {

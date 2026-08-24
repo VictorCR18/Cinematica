@@ -35,3 +35,13 @@ export const listFollowing = asyncHandler(async (req: Request, res: Response) =>
   const { username } = req.params as { username: string };
   res.json(await usersService.listFollowing(username, req.user?.id));
 });
+
+export const listRatings = asyncHandler(async (req: Request, res: Response) => {
+  const { username } = req.params as { username: string };
+  res.json(await usersService.listRatingsByUsername(username, req.query as { page?: string; limit?: string }));
+});
+
+export const listReviews = asyncHandler(async (req: Request, res: Response) => {
+  const { username } = req.params as { username: string };
+  res.json(await usersService.listReviewsByUsername(username, req.query as { page?: string; limit?: string }, req.user?.id));
+});

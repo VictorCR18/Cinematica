@@ -24,3 +24,8 @@ export const changePasswordSchema = z
     message: 'A nova senha deve ser diferente da senha atual',
     path: ['newPassword'],
   });
+
+export const paginationQuerySchema = z.object({
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().positive().max(50).optional(),
+});
