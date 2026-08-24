@@ -19,6 +19,12 @@ export const Navbar = () => {
     setMobileOpen(false);
   };
 
+  const handleLogout = () => {
+    logout.mutate(undefined, {
+      onSuccess: () => navigate('/'),
+    });
+  };
+
   const navLinks = [
     { to: '/filmes/populares', label: 'Populares' },
     { to: '/filmes/em-cartaz', label: 'Em cartaz' },
@@ -66,7 +72,7 @@ export const Navbar = () => {
                 <Avatar name={user.name} src={user.avatarUrl} size={32} />
               </Link>
               <button
-                onClick={() => logout.mutate()}
+                onClick={handleLogout}
                 aria-label="Sair"
                 className="text-muted hover:text-accent transition-colors"
               >
@@ -119,7 +125,7 @@ export const Navbar = () => {
                 <Avatar name={user.name} src={user.avatarUrl} size={28} />
                 <span className="text-sm">{user.name}</span>
               </Link>
-              <button onClick={() => logout.mutate()} className="text-muted">
+              <button onClick={handleLogout} className="text-muted">
                 <LogOut size={18} />
               </button>
             </div>
