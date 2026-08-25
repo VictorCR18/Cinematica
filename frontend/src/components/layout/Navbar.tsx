@@ -82,7 +82,7 @@ export const Navbar = () => {
                 onClick={() => setProfileMenuOpen((open) => !open)}
                 aria-label="Abrir menu do perfil"
                 aria-expanded={profileMenuOpen}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 cursor-pointer"
               >
                 <Avatar name={user.name} src={user.avatarUrl} size={32} />
               </button>
@@ -107,7 +107,7 @@ export const Navbar = () => {
               <button
                 onClick={handleLogout}
                 aria-label="Sair"
-                className="text-muted hover:text-accent transition-colors"
+                className="text-muted hover:text-accent transition-colors cursor-pointer"
               >
                 <LogOut size={18} />
               </button>
@@ -180,7 +180,6 @@ export const Navbar = () => {
                     user.avatarUrl ??
                     `https://api.dicebear.com/9.x/thumbs/svg?seed=${user.username}`
                   }
-                  className="cursor-pointer"
                   size={28}
                 />
                 <span className="text-sm">{user.name}</span>
@@ -198,7 +197,7 @@ export const Navbar = () => {
                     setMobileOpen(false);
                     handleLogout();
                   }}
-                  className="flex items-center gap-1.5 text-muted cursor-pointer"
+                  className="flex items-center gap-1.5 text-muted"
                 >
                   <LogOut size={16} /> Sair
                 </button>
