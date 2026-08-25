@@ -3,21 +3,22 @@ import { tmdbGet } from './tmdb.client.js';
 import type { TmdbMovieDetails, TmdbMovieSummary, TmdbGenre, TmdbPaginatedResponse } from './tmdb.types.js';
 
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 dias
+const REGION = 'BR';
 
 export const getPopular = (page: number) =>
-  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/movie/popular', { page });
+  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/movie/popular', { page, region: REGION });
 
 export const getNowPlaying = (page: number) =>
-  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/movie/now_playing', { page });
+  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/movie/now_playing', { page, region: REGION });
 
 export const getTopRated = (page: number) =>
-  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/movie/top_rated', { page });
+  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/movie/top_rated', { page, region: REGION });
 
 export const getUpcoming = (page: number) =>
-  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/movie/upcoming', { page });
+  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/movie/upcoming', { page, region: REGION });
 
 export const searchMovies = (query: string, page: number) =>
-  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/search/movie', { query, page });
+  tmdbGet<TmdbPaginatedResponse<TmdbMovieSummary>>('/search/movie', { query, page, region: REGION });
 
 export const getGenres = () => tmdbGet<{ genres: TmdbGenre[] }>('/genre/movie/list');
 
@@ -32,7 +33,7 @@ export const ensureMovieCached = async (tmdbId: number) => {
 
   if (existing && !isStale) return existing;
 
-  const details = await tmdbGet<TmdbMovieDetails>(`/movie/${tmdbId}`);
+  const details = await tmdbGet<TmdbMovieDetails>(`/movie/${tmdbId}`, { region: REGION });
 
   return prisma.movie.upsert({
     where: { tmdbId },
@@ -63,7 +64,7 @@ export const ensureMovieCached = async (tmdbId: number) => {
 /** Detalhes completos (TMDB ao vivo: elenco, vídeos, similares) + estatísticas locais do app. */
 export const getMovieDetails = async (tmdbId: number) => {
   const [details, cached, stats] = await Promise.all([
-    tmdbGet<TmdbMovieDetails>(`/movie/${tmdbId}`, { append_to_response: 'credits,videos,similar' }),
+    tmdbGet<TmdbMovieDetails>(`/movie/${tmdbId}`, { append_to_response: 'credits,videos,similar', region: REGION }),
     ensureMovieCached(tmdbId),
     getMovieStats(tmdbId),
   ]);
