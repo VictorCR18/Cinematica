@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
-import { requireAuth } from '../../middlewares/auth.middleware.js';
+import { optionalAuth, requireAuth } from '../../middlewares/auth.middleware.js';
 import { validate } from '../../middlewares/validate.middleware.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import * as diaryService from './diary.service.js';
@@ -27,9 +27,16 @@ diaryRouter.get(
 
 diaryRouter.get(
   '/user/:username',
+  optionalAuth,
   validate({ params: usernameParamSchema }),
   asyncHandler(async (req: Request, res: Response) => {
-    res.json(await diaryService.listDiaryByUsername(req.params.username as string, req.query as { page?: string; limit?: string }));
+    res.json(
+      await diaryService.listDiaryByUsername(
+        req.params.username as string,
+        req.query as { page?: string; limit?: string },
+        req.user?.id,
+      ),
+    );
   }),
 );
 

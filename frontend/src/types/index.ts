@@ -5,6 +5,7 @@ export interface User {
   email?: string;
   bio: string | null;
   avatarUrl: string | null;
+  diaryPublic?: boolean;
   reviewsPublic?: boolean;
   watchlistPublic?: boolean;
   listsPublic?: boolean;
@@ -13,6 +14,7 @@ export interface User {
 
 export interface UserSettings {
   email: string;
+  diaryPublic: boolean;
   reviewsPublic: boolean;
   watchlistPublic: boolean;
   listsPublic: boolean;

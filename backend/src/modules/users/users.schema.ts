@@ -11,6 +11,7 @@ export const updateMeSchema = z.object({
 });
 
 export const updateSettingsSchema = z.object({
+  diaryPublic: z.boolean().optional(),
   reviewsPublic: z.boolean().optional(),
   watchlistPublic: z.boolean().optional(),
   listsPublic: z.boolean().optional(),

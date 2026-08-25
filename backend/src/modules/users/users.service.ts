@@ -12,6 +12,7 @@ const profileSelect = {
   username: true,
   bio: true,
   avatarUrl: true,
+  diaryPublic: true,
   reviewsPublic: true,
   watchlistPublic: true,
   listsPublic: true,
@@ -20,6 +21,7 @@ const profileSelect = {
 
 const settingsSelect = {
   email: true,
+  diaryPublic: true,
   reviewsPublic: true,
   watchlistPublic: true,
   listsPublic: true,
@@ -54,7 +56,10 @@ export const updateMe = (userId: string, data: { name?: string; bio?: string; av
 export const getSettings = (userId: string) =>
   prisma.user.findUniqueOrThrow({ where: { id: userId }, select: settingsSelect });
 
-export const updateSettings = (userId: string, data: { reviewsPublic?: boolean; watchlistPublic?: boolean; listsPublic?: boolean }) =>
+export const updateSettings = (
+  userId: string,
+  data: { diaryPublic?: boolean; reviewsPublic?: boolean; watchlistPublic?: boolean; listsPublic?: boolean },
+) =>
   prisma.user.update({ where: { id: userId }, data, select: settingsSelect });
 
 export const changeEmail = async (userId: string, input: { email: string; currentPassword: string }) => {

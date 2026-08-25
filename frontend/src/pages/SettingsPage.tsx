@@ -7,6 +7,7 @@ import { useAuthStore } from '../store/auth-store';
 import { Button } from '../components/ui/Button';
 
 const privacyOptions = [
+  { key: 'diaryPublic', label: 'Diário', description: 'Permitir que outras pessoas vejam seu diário de filmes.' },
   { key: 'reviewsPublic', label: 'Resenhas', description: 'Permitir que outras pessoas vejam suas resenhas.' },
   { key: 'watchlistPublic', label: 'Watchlist', description: 'Permitir que outras pessoas vejam seus filmes para assistir.' },
   { key: 'listsPublic', label: 'Listas', description: 'Permitir que outras pessoas vejam suas listas.' },
@@ -18,7 +19,7 @@ export const SettingsPage = () => {
   const queryClient = useQueryClient();
   const viewer = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
-  const [privacy, setPrivacy] = useState<SettingsForm>({ reviewsPublic: true, watchlistPublic: true, listsPublic: true });
+  const [privacy, setPrivacy] = useState<SettingsForm>({ diaryPublic: true, reviewsPublic: true, watchlistPublic: true, listsPublic: true });
   const [email, setEmail] = useState('');
   const [currentEmailPassword, setCurrentEmailPassword] = useState('');
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
@@ -32,7 +33,12 @@ export const SettingsPage = () => {
 
   useEffect(() => {
     if (!settings) return;
-    setPrivacy({ reviewsPublic: settings.reviewsPublic, watchlistPublic: settings.watchlistPublic, listsPublic: settings.listsPublic });
+    setPrivacy({
+      diaryPublic: settings.diaryPublic,
+      reviewsPublic: settings.reviewsPublic,
+      watchlistPublic: settings.watchlistPublic,
+      listsPublic: settings.listsPublic,
+    });
     setEmail(settings.email);
   }, [settings]);
 

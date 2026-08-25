@@ -97,9 +97,19 @@ export const listMyDiary = async (userId: string, query: PaginationQuery) => {
 export const listDiaryByUsername = async (
   username: string,
   query: PaginationQuery,
+  viewerId?: string,
 ) => {
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findUnique({
+    where: { username },
+    select: { id: true, diaryPublic: true },
+  });
   if (!user) throw AppError.notFound("Usuário não encontrado");
+
+  if (!user.diaryPublic && user.id !== viewerId) {
+    const { page, limit } = parsePagination(query);
+    return { data: [], meta: buildMeta(page, limit, 0) };
+  }
+
   return listMyDiary(user.id, query);
 };
 

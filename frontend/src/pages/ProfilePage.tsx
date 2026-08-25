@@ -43,22 +43,26 @@ export const ProfilePage = () => {
     enabled: Boolean(username),
   });
 
+  const canViewDiary = profile?.isViewer || profile?.diaryPublic !== false;
+  const canViewLists = profile?.isViewer || profile?.listsPublic !== false;
+  const canViewWatchlist = profile?.isViewer || profile?.watchlistPublic !== false;
+
   const { data: diary } = useQuery({
     queryKey: ["diary", username],
     queryFn: () => listDiaryByUsername(username as string, 1),
-    enabled: Boolean(username) && tab === "diario",
+    enabled: Boolean(username) && tab === "diario" && canViewDiary,
   });
 
   const { data: lists } = useQuery({
     queryKey: ["lists", username],
     queryFn: () => listListsByUsername(username as string),
-    enabled: Boolean(username) && tab === "listas",
+    enabled: Boolean(username) && tab === "listas" && canViewLists,
   });
 
   const { data: watchlist } = useQuery({
     queryKey: ["watchlist", username],
     queryFn: () => listWatchlistByUsername(username as string),
-    enabled: Boolean(username) && tab === "watchlist",
+    enabled: Boolean(username) && tab === "watchlist" && canViewWatchlist,
   });
 
   useEffect(() => {
@@ -185,7 +189,7 @@ export const ProfilePage = () => {
       </div>
 
       <div className="mt-10 flex gap-1 border-b border-border">
-        {(["diario", profile.listsPublic !== false ? "listas" : null, profile.watchlistPublic !== false ? "watchlist" : null].filter(Boolean) as Tab[]).map((t) => (
+        {(["diario", "listas", "watchlist"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -206,8 +210,10 @@ export const ProfilePage = () => {
       </div>
 
       <div ref={diarySectionRef} className="mt-8 scroll-mt-32">
-        {tab === "diario" &&
-          (diary && diary.data.length > 0 ? (
+        {tab === "diario" && (
+          !canViewDiary ? (
+            <p className="text-sm text-muted">Este usuário privatizou o diário.</p>
+          ) : diary && diary.data.length > 0 ? (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 md:grid-cols-6">
               {diary.data.map((entry) => {
                 const poster = tmdbImage(entry.movie.posterPath, "w200");
@@ -237,10 +243,13 @@ export const ProfilePage = () => {
             </div>
           ) : (
             <p className="text-sm text-muted">Nenhum filme registrado ainda.</p>
-          ))}
+          )
+        )}
 
-        {tab === "listas" &&
-          (lists && lists.length > 0 ? (
+        {tab === "listas" && (
+          !canViewLists ? (
+            <p className="text-sm text-muted">Este usuário privatizou as listas.</p>
+          ) : lists && lists.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {lists.map((list) => (
                 <Link
@@ -259,9 +268,12 @@ export const ProfilePage = () => {
             </div>
           ) : (
             <p className="text-sm text-muted">Nenhuma lista criada ainda.</p>
-          ))}
-        {tab === "watchlist" &&
-          (watchlist && watchlist.length > 0 ? (
+          )
+        )}
+        {tab === "watchlist" && (
+          !canViewWatchlist ? (
+            <p className="text-sm text-muted">Este usuário privatizou a watchlist.</p>
+          ) : watchlist && watchlist.length > 0 ? (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 md:grid-cols-6">
               {watchlist.map((item) => {
                 const poster = tmdbImage(item.movie.posterPath, "w200");
@@ -288,7 +300,8 @@ export const ProfilePage = () => {
             <p className="text-sm text-muted">
               Nenhum filme na watchlist ainda.
             </p>
-          ))}
+          )
+        )}
       </div>
 
       <EditProfileModal
