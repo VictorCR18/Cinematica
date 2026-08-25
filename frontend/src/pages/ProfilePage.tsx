@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
@@ -53,25 +53,6 @@ export const ProfilePage = () => {
     enabled: Boolean(username) && tab === "diario" && canViewDiary,
   });
 
-  const uniqueDiaryEntries = useMemo(() => {
-    if (!diary?.data) return [];
-
-    const latestByMovie = new Map<string, (typeof diary.data)[number]>();
-
-    for (const entry of diary.data) {
-      const key = String(entry.movie.tmdbId ?? entry.movie.id);
-      const current = latestByMovie.get(key);
-      const isNewer =
-        !current ||
-        new Date(entry.watchedAt).getTime() > new Date(current.watchedAt).getTime();
-      if (isNewer) latestByMovie.set(key, entry);
-    }
-
-    return Array.from(latestByMovie.values()).sort(
-      (a, b) => new Date(b.watchedAt).getTime() - new Date(a.watchedAt).getTime(),
-    );
-  }, [diary]);
-
   const { data: lists } = useQuery({
     queryKey: ["lists", username],
     queryFn: () => listListsByUsername(username as string),
@@ -102,8 +83,6 @@ export const ProfilePage = () => {
       </div>
     );
   }
-
-  const filmesCount = diary ? uniqueDiaryEntries.length : profile.stats.diaryCount;
 
   const isViewer = viewer?.username === profile.username;
 
@@ -152,7 +131,7 @@ export const ProfilePage = () => {
 
       <div className="mt-8 grid grid-cols-3 gap-4 sm:grid-cols-5">
         {[
-          ["Filmes", filmesCount],
+          ["Filmes", profile.stats.diaryCount],
           [
             "Avaliações",
             profile.stats.ratingsCount,
@@ -234,13 +213,13 @@ export const ProfilePage = () => {
         {tab === "diario" && (
           !canViewDiary ? (
             <p className="text-sm text-muted">Este usuário privatizou o diário.</p>
-          ) : uniqueDiaryEntries.length > 0 ? (
+          ) : diary && diary.data.length > 0 ? (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 md:grid-cols-6">
-              {uniqueDiaryEntries.map((entry) => {
+              {diary.data.map((entry) => {
                 const poster = tmdbImage(entry.movie.posterPath, "w200");
                 return (
                   <Link
-                    key={entry.movie.tmdbId ?? entry.movie.id}
+                    key={entry.id}
                     to={`/filme/${entry.movie.tmdbId}`}
                     className="group"
                   >

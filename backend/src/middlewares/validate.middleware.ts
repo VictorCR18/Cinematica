@@ -25,6 +25,7 @@ const replaceObjectValues = (target: unknown, source: unknown) => {
   return true;
 };
 
+/** Valida body/query/params com Zod e substitui pelos dados já parseados/coeridos. */
 export const validate =
   (schemas: Schemas) => (req: Request, _res: Response, next: NextFunction) => {
     if (schemas.body) {
