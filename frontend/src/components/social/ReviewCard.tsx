@@ -1,15 +1,20 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "motion/react";
-import { Heart, Pencil, X, Check } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { Heart, Pencil, Trash2, MoreVertical, X, Check } from "lucide-react";
 import clsx from "clsx";
 import { Avatar } from "../ui/Avatar";
 import { StarRating } from "../ui/StarRating";
 import { useAuth } from "../../hooks/useAuth";
-import { likeReview, unlikeReview, updateReview } from "../../lib/api/reviews";
+import { likeReview, unlikeReview, updateReview, deleteReview } from "../../lib/api/reviews";
 import type { Review } from "../../types";
 
-export const ReviewCard = ({ review }: { review: Review }) => {
+interface ReviewCardProps {
+  review: Review;
+  onDeleted?: (reviewId: string) => void;
+}
+
+export const ReviewCard = ({ review, onDeleted }: ReviewCardProps) => {
   const { isAuthenticated, user } = useAuth();
   const [liked, setLiked] = useState(review.isLikedByViewer ?? false);
   const [likesCount, setLikesCount] = useState(review.likesCount);
@@ -26,6 +31,29 @@ export const ReviewCard = ({ review }: { review: Review }) => {
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+        setConfirmingDelete(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setConfirmingDelete(false);
+  };
 
   const toggleLike = async () => {
     if (!isAuthenticated) return;
@@ -51,6 +79,7 @@ export const ReviewCard = ({ review }: { review: Review }) => {
     setEditSpoilers(containsSpoilers);
     setError(null);
     setIsEditing(true);
+    closeMenu();
   };
 
   const cancelEditing = () => {
@@ -78,6 +107,27 @@ export const ReviewCard = ({ review }: { review: Review }) => {
       setError("Não foi possível salvar. Tente novamente.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteClick = () => {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    void handleDelete();
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteReview(review.id);
+      onDeleted?.(review.id);
+    } catch {
+      setDeleteError("Não foi possível excluir. Tente novamente.");
+      setConfirmingDelete(false);
+      setDeleting(false);
     }
   };
 
@@ -109,16 +159,54 @@ export const ReviewCard = ({ review }: { review: Review }) => {
             <StarRating value={review.rating} readOnly size={14} />
           )}
           {isOwner && !isEditing && (
-            <button
-              onClick={startEditing}
-              title="Editar resenha"
-              className="text-muted hover:text-paper transition-colors"
-            >
-              <Pencil size={14} />
-            </button>
+            <div ref={menuRef} className="relative">
+              <button
+                onClick={() => setMenuOpen((o) => !o)}
+                title="Opções da resenha"
+                aria-label="Opções da resenha"
+                aria-expanded={menuOpen}
+                className="text-muted transition-colors hover:text-paper"
+              >
+                <MoreVertical size={16} />
+              </button>
+
+              <AnimatePresence>
+                {menuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-full z-10 mt-1.5 w-40 overflow-hidden rounded-lg border border-border bg-panel shadow-xl"
+                  >
+                    <button
+                      onClick={startEditing}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-paper-dim transition-colors hover:bg-ink hover:text-paper"
+                    >
+                      <Pencil size={13} /> Editar
+                    </button>
+                    <button
+                      onClick={handleDeleteClick}
+                      disabled={deleting}
+                      className={clsx(
+                        "flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors disabled:opacity-50",
+                        confirmingDelete
+                          ? "bg-red-500/10 text-red-400 hover:bg-red-500/15"
+                          : "text-paper-dim hover:bg-ink hover:text-red-400",
+                      )}
+                    >
+                      <Trash2 size={13} />
+                      {deleting ? "Excluindo..." : confirmingDelete ? "Confirmar exclusão" : "Excluir"}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           )}
         </div>
       </div>
+
+      {deleteError && <p className="mt-2 text-xs text-red-400">{deleteError}</p>}
 
       <div className="mt-3 text-sm leading-relaxed text-paper-dim">
         {isEditing ? (

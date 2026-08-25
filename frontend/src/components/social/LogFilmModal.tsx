@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { X } from 'lucide-react';
 import { StarRating } from '../ui/StarRating';
@@ -14,15 +14,27 @@ interface LogFilmModalProps {
   onLogged?: () => void;
 }
 
-/** Modal para registrar no diário: nota, data assistida, rewatch e resenha opcional. */
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
 export const LogFilmModal = ({ tmdbId, movieTitle, open, onClose, onLogged }: LogFilmModalProps) => {
   const [rating, setRating] = useState<number | null>(null);
-  const [watchedAt, setWatchedAt] = useState(() => new Date().toISOString().slice(0, 10));
+  const [watchedAt, setWatchedAt] = useState(todayIso);
   const [rewatch, setRewatch] = useState(false);
   const [content, setContent] = useState('');
   const [containsSpoilers, setContainsSpoilers] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setRating(null);
+    setWatchedAt(todayIso());
+    setRewatch(false);
+    setContent('');
+    setContainsSpoilers(false);
+    setSubmitting(false);
+    setError(null);
+  }, [open]);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -40,7 +52,6 @@ export const LogFilmModal = ({ tmdbId, movieTitle, open, onClose, onLogged }: Lo
       onClose();
     } catch (err) {
       setError(getApiErrorMessage(err, 'Não foi possível registrar no diário'));
-    } finally {
       setSubmitting(false);
     }
   };
@@ -81,7 +92,7 @@ export const LogFilmModal = ({ tmdbId, movieTitle, open, onClose, onLogged }: Lo
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                 <div className="flex-1">
                   <label className="text-xs text-muted" htmlFor="watchedAt">
                     Assistido em
@@ -91,11 +102,11 @@ export const LogFilmModal = ({ tmdbId, movieTitle, open, onClose, onLogged }: Lo
                     type="date"
                     value={watchedAt}
                     onChange={(e) => setWatchedAt(e.target.value)}
-                    max={new Date().toISOString().slice(0, 10)}
+                    max={todayIso()}
                     className="mt-1.5 w-full rounded-lg border border-border-strong bg-ink px-3 py-2 text-sm outline-none focus:border-accent"
                   />
                 </div>
-                <label className="flex items-center gap-2 text-sm text-paper-dim pt-5">
+                <label className="flex items-center gap-2 text-sm text-paper-dim sm:pt-5">
                   <input type="checkbox" checked={rewatch} onChange={(e) => setRewatch(e.target.checked)} className="accent-accent" />
                   Rewatch
                 </label>
