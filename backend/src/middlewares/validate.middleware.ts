@@ -8,6 +8,8 @@ interface Schemas {
   params?: ZodType;
 }
 
+const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
 const replaceObjectValues = (target: unknown, source: unknown) => {
   if (!target || typeof target !== 'object' || !source || typeof source !== 'object') return false;
 
@@ -15,11 +17,14 @@ const replaceObjectValues = (target: unknown, source: unknown) => {
     delete (target as Record<string, unknown>)[key];
   }
 
-  Object.assign(target, source);
+  for (const [key, value] of Object.entries(source)) {
+    if (DANGEROUS_KEYS.has(key)) continue;
+    (target as Record<string, unknown>)[key] = value;
+  }
+
   return true;
 };
 
-/** Valida body/query/params com Zod e substitui pelos dados já parseados/coeridos. */
 export const validate =
   (schemas: Schemas) => (req: Request, _res: Response, next: NextFunction) => {
     if (schemas.body) {

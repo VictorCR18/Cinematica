@@ -18,13 +18,13 @@ const setAuthCookie = (res: Response, token: string) => {
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, token } = await authService.register(req.body);
   setAuthCookie(res, token);
-  res.status(201).json({ user, token });
+  res.status(201).json({ user });
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { user, token } = await authService.login(req.body);
   setAuthCookie(res, token);
-  res.json({ user, token });
+  res.json({ user });
 });
 
 export const logout = asyncHandler(async (_req: Request, res: Response) => {
