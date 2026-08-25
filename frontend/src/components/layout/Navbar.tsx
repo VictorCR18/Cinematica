@@ -171,7 +171,7 @@ export const Navbar = () => {
             <div className="space-y-2 border-t border-border pt-2">
               <Link
                 to={`/perfil/${user.username}`}
-                className="flex items-center gap-2 cursor-pointer"
+                className="flex items-center gap-2"
                 onClick={() => setMobileOpen(false)}
               >
                 <Avatar
@@ -180,6 +180,7 @@ export const Navbar = () => {
                     user.avatarUrl ??
                     `https://api.dicebear.com/9.x/thumbs/svg?seed=${user.username}`
                   }
+                  className="cursor-pointer"
                   size={28}
                 />
                 <span className="text-sm">{user.name}</span>
@@ -197,7 +198,7 @@ export const Navbar = () => {
                     setMobileOpen(false);
                     handleLogout();
                   }}
-                  className="flex items-center gap-1.5 text-muted"
+                  className="flex items-center gap-1.5 text-muted cursor-pointer"
                 >
                   <LogOut size={16} /> Sair
                 </button>
