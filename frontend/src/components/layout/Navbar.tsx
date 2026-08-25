@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { Film, Search, Menu, X, LogOut, Settings } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { Avatar } from '../ui/Avatar';
-import { Button } from '../ui/Button';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "motion/react";
+import { Film, Search, Menu, X, LogOut, Settings } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import { Avatar } from "../ui/Avatar";
+import { Button } from "../ui/Button";
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -22,15 +22,15 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     logout.mutate(undefined, {
-      onSuccess: () => navigate('/'),
+      onSuccess: () => navigate("/"),
     });
   };
 
   const navLinks = [
-    { to: '/filmes/populares', label: 'Populares' },
-    { to: '/filmes/em-cartaz', label: 'Em cartaz' },
-    { to: '/filmes/mais-avaliados', label: 'Mais avaliados' },
-    ...(isAuthenticated ? [{ to: '/feed', label: 'Feed' }] : []),
+    { to: "/filmes/populares", label: "Populares" },
+    { to: "/filmes/em-cartaz", label: "Em cartaz" },
+    { to: "/filmes/mais-avaliados", label: "Mais avaliados" },
+    ...(isAuthenticated ? [{ to: "/feed", label: "Feed" }] : []),
   ];
 
   return (
@@ -38,7 +38,9 @@ export const Navbar = () => {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <Film className="text-accent" size={26} strokeWidth={2} />
-          <span className="font-display text-xl font-semibold tracking-tight">Cinemática</span>
+          <span className="font-display text-xl font-semibold tracking-tight">
+            Cinemática
+          </span>
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1 ml-4">
@@ -54,9 +56,15 @@ export const Navbar = () => {
           ))}
         </nav>
 
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm ml-auto items-center">
+        <form
+          onSubmit={handleSearch}
+          className="hidden md:flex flex-1 max-w-sm ml-auto items-center"
+        >
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+              size={16}
+            />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -80,10 +88,18 @@ export const Navbar = () => {
               </button>
               {profileMenuOpen && (
                 <div className="absolute right-0 top-11 z-10 w-48 rounded-card border border-border bg-panel p-1 shadow-xl">
-                  <Link to={`/perfil/${user.username}`} onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-paper-dim hover:bg-ink hover:text-paper">
+                  <Link
+                    to={`/perfil/${user.username}`}
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-paper-dim hover:bg-ink hover:text-paper"
+                  >
                     <Film size={16} /> Ver perfil
                   </Link>
-                  <Link to="/configuracoes" onClick={() => setProfileMenuOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-paper-dim hover:bg-ink hover:text-paper">
+                  <Link
+                    to="/configuracoes"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-paper-dim hover:bg-ink hover:text-paper"
+                  >
                     <Settings size={16} /> Configurações
                   </Link>
                 </div>
@@ -98,17 +114,24 @@ export const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/entrar" className="px-3 py-2 text-sm text-paper-dim hover:text-paper">
+              <Link
+                to="/entrar"
+                className="px-3 py-2 text-sm text-paper-dim hover:text-paper"
+              >
                 Entrar
               </Link>
-              <Button size="sm" onClick={() => navigate('/registrar')}>
+              <Button size="sm" onClick={() => navigate("/registrar")}>
                 Criar conta
               </Button>
             </div>
           )}
         </div>
 
-        <button className="ml-auto md:hidden text-paper" onClick={() => setMobileOpen((o) => !o)} aria-label="Abrir menu">
+        <button
+          className="ml-auto md:hidden text-paper"
+          onClick={() => setMobileOpen((o) => !o)}
+          aria-label="Abrir menu"
+        >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
@@ -116,12 +139,15 @@ export const Navbar = () => {
       {mobileOpen && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
+          animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           className="md:hidden border-t border-border px-4 py-4 space-y-4"
         >
           <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+              size={16}
+            />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -131,19 +157,39 @@ export const Navbar = () => {
           </form>
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => (
-              <Link key={link.to} to={link.to} className="py-2 text-paper-dim" onClick={() => setMobileOpen(false)}>
+              <Link
+                key={link.to}
+                to={link.to}
+                className="py-2 text-paper-dim"
+                onClick={() => setMobileOpen(false)}
+              >
                 {link.label}
               </Link>
             ))}
           </nav>
           {isAuthenticated && user ? (
             <div className="space-y-2 border-t border-border pt-2">
-              <Link to={`/perfil/${user.username}`} className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-                <Avatar name={user.name} src={user.avatarUrl} size={28} />
+              <Link
+                to={`/perfil/${user.username}`}
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Avatar
+                  name={user.name}
+                  src={
+                    user.avatarUrl ??
+                    `https://api.dicebear.com/9.x/thumbs/svg?seed=${user.username}`
+                  }
+                  size={28}
+                />
                 <span className="text-sm">{user.name}</span>
               </Link>
               <div className="flex flex-col items-start gap-2 pt-2 text-md">
-                <Link to="/configuracoes" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5 pb-2 text-paper-dim">
+                <Link
+                  to="/configuracoes"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-1.5 pb-2 text-paper-dim"
+                >
                   <Settings size={16} /> Configurações
                 </Link>
                 <button
@@ -159,10 +205,18 @@ export const Navbar = () => {
             </div>
           ) : (
             <div className="flex gap-2 pt-2 border-t border-border">
-              <Link to="/entrar" className="flex-1 text-center py-2 text-sm border border-border-strong rounded-full" onClick={() => setMobileOpen(false)}>
+              <Link
+                to="/entrar"
+                className="flex-1 text-center py-2 text-sm border border-border-strong rounded-full"
+                onClick={() => setMobileOpen(false)}
+              >
                 Entrar
               </Link>
-              <Link to="/registrar" className="flex-1 text-center py-2 text-sm bg-accent rounded-full" onClick={() => setMobileOpen(false)}>
+              <Link
+                to="/registrar"
+                className="flex-1 text-center py-2 text-sm bg-accent rounded-full"
+                onClick={() => setMobileOpen(false)}
+              >
                 Criar conta
               </Link>
             </div>
